@@ -8,6 +8,7 @@ import ModuleRoutes from "./Kambaz/Modules/routes.js";
 import Database from "./Kambaz/Database/index.js";
 import EnrollmentRoutes from "./Kambaz/Enrollments/routes.js";
 import Lab5 from "./Lab5/index.js";
+import Hello from "./Hello.js";
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use(session(sessionOptions));
 app.use(express.json());
 
 // Routes
+Hello(app);
 Lab5(app);
 UserRoutes(app, Database);
 CourseRoutes(app, Database);
