@@ -55,16 +55,25 @@ export default function UserRoutes(app, db) {
   };
 
   const updateUser = async (req, res) => {
-    const { userId } = req.params;
-    const userUpdates = req.body;
-    await dao.updateUser(userId, userUpdates);
-    const currentUser = req.session["currentUser"];
-    if (currentUser && currentUser._id === userId) {
+    try {
+      const { userId } = req.params;
+      const userUpdates = req.body;
+      const existingUser = await dao.findUserById(userId);
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      await dao.updateUser(userId, userUpdates);
+      const currentUser = req.session["currentUser"];
+      if (currentUser && currentUser._id === userId) {
+        const updatedUser = await dao.findUserById(userId);
+        req.session["currentUser"] = updatedUser;
+      }
       const updatedUser = await dao.findUserById(userId);
-      req.session["currentUser"] = updatedUser;
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Error updating user", error: error.message });
     }
-    const updatedUser = await dao.findUserById(userId);
-    res.json(updatedUser);
   };
 
   const findAllUsers = async (req, res) => {
@@ -84,15 +93,32 @@ export default function UserRoutes(app, db) {
   };
 
   const findUserById = async (req, res) => {
-    const { userId } = req.params;
-    const user = await dao.findUserById(userId);
-    res.json(user);
+    try {
+      const { userId } = req.params;
+      const user = await dao.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Error finding user by ID:", error);
+      res.status(500).json({ message: "Error finding user", error: error.message });
+    }
   };
 
   const deleteUser = async (req, res) => {
-    const { userId } = req.params;
-    await dao.deleteUser(userId);
-    res.sendStatus(204);
+    try {
+      const { userId } = req.params;
+      const user = await dao.findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      await dao.deleteUser(userId);
+      res.sendStatus(204);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Error deleting user", error: error.message });
+    }
   };
 
   const createUser = async (req, res) => {
