@@ -47,8 +47,8 @@ const app = express();
 
 // CORS configuration - MUST come before session
 const corsOptions = {
-  credentials: true,
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+    credentials: true,
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   exposedHeaders: ["Set-Cookie"],

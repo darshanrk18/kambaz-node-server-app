@@ -9,7 +9,7 @@ export default function UserRoutes(app, db) {
 
   const signin = async (req, res) => {
     try {
-      const { username, password } = req.body;
+    const { username, password } = req.body;
       
       if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
@@ -17,10 +17,10 @@ export default function UserRoutes(app, db) {
 
       const currentUser = await dao.findUserByCredentials(username, password);
       
-      if (currentUser) {
-        req.session["currentUser"] = currentUser;
-        res.json(currentUser);
-      } else {
+    if (currentUser) {
+      req.session["currentUser"] = currentUser;
+      res.json(currentUser);
+    } else {
         res.status(401).json({ message: "Invalid username or password" });
       }
     } catch (error) {
@@ -117,12 +117,12 @@ export default function UserRoutes(app, db) {
 
   const findUserById = async (req, res) => {
     try {
-      const { userId } = req.params;
+    const { userId } = req.params;
       const user = await dao.findUserById(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      res.json(user);
+    res.json(user);
     } catch (error) {
       console.error("Error finding user by ID:", error);
       res.status(500).json({ message: "Error finding user", error: error.message });
@@ -131,13 +131,13 @@ export default function UserRoutes(app, db) {
 
   const deleteUser = async (req, res) => {
     try {
-      const { userId } = req.params;
+    const { userId } = req.params;
       const user = await dao.findUserById(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       await dao.deleteUser(userId);
-      res.sendStatus(204);
+    res.sendStatus(204);
     } catch (error) {
       console.error("Error deleting user:", error);
       res.status(500).json({ message: "Error deleting user", error: error.message });

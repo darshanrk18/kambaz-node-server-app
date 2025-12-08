@@ -6,14 +6,14 @@ export default function UsersDao(db) {
     const newUser = { ...user, _id: uuidv4() };
     return await model.create(newUser);
   };
-
+  
   const findAllUsers = () => model.find().lean();
-
+  
   const findUserById = (userId) => model.findById(userId).lean();
-
-  const findUserByUsername = (username) =>
+  
+  const findUserByUsername = (username) => 
     model.findOne({ username: username }).lean();
-
+  
   const findUserByCredentials = async (username, password) => {
     try {
       // Debug: Check if user exists
@@ -46,12 +46,12 @@ export default function UsersDao(db) {
       $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
     }).lean();
   };
-
+  
   const updateUser = (userId, user) =>
     model.updateOne({ _id: userId }, { $set: user });
 
   const deleteUser = (userId) => model.findByIdAndDelete(userId);
-
+  
   return {
     createUser,
     findAllUsers,
