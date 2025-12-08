@@ -8,13 +8,24 @@ export default function UserRoutes(app, db) {
   const enrollmentsDao = EnrollmentsDao(db);
 
   const signin = async (req, res) => {
-    const { username, password } = req.body;
-    const currentUser = await dao.findUserByCredentials(username, password);
-    if (currentUser) {
-      req.session["currentUser"] = currentUser;
-      res.json(currentUser);
-    } else {
-      res.status(401).json({ message: "Unable to login. Try again later." });
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      const currentUser = await dao.findUserByCredentials(username, password);
+      
+      if (currentUser) {
+        req.session["currentUser"] = currentUser;
+        res.json(currentUser);
+      } else {
+        res.status(401).json({ message: "Invalid username or password" });
+      }
+    } catch (error) {
+      console.error("Signin error:", error);
+      res.status(500).json({ message: "Server error during signin", error: error.message });
     }
   };
 

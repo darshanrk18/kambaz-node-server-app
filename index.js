@@ -13,7 +13,25 @@ import Hello from "./Hello.js";
 
 // MongoDB connection
 const CONNECTION_STRING = process.env.DATABASE_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz";
-mongoose.connect(CONNECTION_STRING);
+
+if (!process.env.DATABASE_CONNECTION_STRING) {
+  console.warn("WARNING: DATABASE_CONNECTION_STRING not set! Using default localhost connection.");
+  console.warn("For production, set DATABASE_CONNECTION_STRING environment variable.");
+}
+
+mongoose.connect(CONNECTION_STRING).catch((error) => {
+  console.error("MongoDB connection error:", error.message);
+  console.error("Make sure DATABASE_CONNECTION_STRING is set correctly in your environment variables.");
+  process.exit(1);
+});
+
+mongoose.connection.on("connected", () => {
+  console.log("Connected to MongoDB:", CONNECTION_STRING.replace(/\/\/[^:]+:[^@]+@/, "//***:***@")); // Hide credentials in logs
+});
+
+mongoose.connection.on("error", (error) => {
+  console.error("MongoDB connection error:", error.message);
+});
 
 const app = express();
 
