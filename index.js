@@ -58,14 +58,19 @@ const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    httpOnly: true,
+  },
 };
 
 if (process.env.SERVER_ENV !== "development") {
   sessionOptions.proxy = true;
-  sessionOptions.cookie = {
-    sameSite: "none",
-    secure: true,
-  };
+  sessionOptions.cookie.sameSite = "none";
+  sessionOptions.cookie.secure = true;
+} else {
+  sessionOptions.cookie.sameSite = "lax";
+  sessionOptions.cookie.secure = false;
 }
 
 app.use(session(sessionOptions));
