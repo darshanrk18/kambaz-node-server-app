@@ -46,8 +46,19 @@ export default function UserRoutes(app, db) {
   };
 
   const profile = (req, res) => {
+    // Log session info for debugging (remove in production if needed)
+    const sessionId = req.sessionID;
     const currentUser = req.session["currentUser"];
+    
     if (!currentUser) {
+      // Log why session might be missing
+      if (!req.session) {
+        console.log("Profile: No session object found");
+      } else if (!sessionId) {
+        console.log("Profile: No session ID found");
+      } else {
+        console.log("Profile: Session exists but no currentUser");
+      }
       res.sendStatus(401);
       return;
     }

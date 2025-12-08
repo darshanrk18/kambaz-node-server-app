@@ -46,21 +46,26 @@ mongoose.connection.on("error", (error) => {
 const app = express();
 
 // CORS configuration - MUST come before session
-app.use(
-  cors({
-    credentials: true,
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-  })
-);
+const corsOptions = {
+  credentials: true,
+  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Set-Cookie"],
+};
+
+app.use(cors(corsOptions));
 
 // Session configuration
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
+  name: "kambaz.sid", // Custom session name
   cookie: {
     maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
     httpOnly: true,
+    path: "/", // Ensure cookie is available for all paths
   },
 };
 
@@ -68,6 +73,8 @@ if (process.env.SERVER_ENV !== "development") {
   sessionOptions.proxy = true;
   sessionOptions.cookie.sameSite = "none";
   sessionOptions.cookie.secure = true;
+  // In production, ensure cookie works across domains
+  sessionOptions.cookie.domain = undefined; // Let browser set domain automatically
 } else {
   sessionOptions.cookie.sameSite = "lax";
   sessionOptions.cookie.secure = false;
