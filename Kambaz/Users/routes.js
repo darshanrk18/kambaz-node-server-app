@@ -57,7 +57,19 @@ export default function UserRoutes(app, db) {
   const updateUser = async (req, res) => {
     try {
       const { userId } = req.params;
-      const userUpdates = req.body;
+      const userUpdates = { ...req.body };
+      
+      // Convert dob string to Date object if provided
+      if (userUpdates.dob && typeof userUpdates.dob === 'string') {
+        const dobDate = new Date(userUpdates.dob);
+        if (Number.isNaN(dobDate.getTime())) {
+          // If invalid date, remove it
+          delete userUpdates.dob;
+        } else {
+          userUpdates.dob = dobDate;
+        }
+      }
+      
       const existingUser = await dao.findUserById(userId);
       if (!existingUser) {
         return res.status(404).json({ message: "User not found" });

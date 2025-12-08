@@ -7,12 +7,12 @@ export default function UsersDao(db) {
     return await model.create(newUser);
   };
 
-  const findAllUsers = () => model.find();
+  const findAllUsers = () => model.find().lean();
 
-  const findUserById = (userId) => model.findById(userId);
+  const findUserById = (userId) => model.findById(userId).lean();
 
   const findUserByUsername = (username) =>
-    model.findOne({ username: username });
+    model.findOne({ username: username }).lean();
 
   const findUserByCredentials = async (username, password) => {
     try {
@@ -30,7 +30,7 @@ export default function UsersDao(db) {
         return null;
       }
       
-      const user = await model.findOne({ username, password });
+      const user = await model.findOne({ username, password }).lean();
       return user;
     } catch (error) {
       console.error("findUserByCredentials error:", error);
@@ -38,13 +38,13 @@ export default function UsersDao(db) {
     }
   };
 
-  const findUsersByRole = (role) => model.find({ role: role });
+  const findUsersByRole = (role) => model.find({ role: role }).lean();
 
   const findUsersByPartialName = (partialName) => {
     const regex = new RegExp(partialName, "i"); // 'i' makes it case-insensitive
     return model.find({
       $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
-    });
+    }).lean();
   };
 
   const updateUser = (userId, user) =>
