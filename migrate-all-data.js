@@ -9,8 +9,9 @@ import gradeSchema from "./Kambaz/Grades/schema.js";
 // Connect to MongoDB
 const CONNECTION_STRING = process.env.DATABASE_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz";
 
-await mongoose.connect(CONNECTION_STRING);
-console.log("Connected to MongoDB");
+await mongoose.connect(CONNECTION_STRING, { dbName: "kambaz" });
+const dbName = mongoose.connection.db?.databaseName || "unknown";
+console.log("Connected to MongoDB database:", dbName);
 
 // Create models
 const User = mongoose.model("UserModel", userSchema);

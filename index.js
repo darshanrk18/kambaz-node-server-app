@@ -20,14 +20,23 @@ if (!process.env.DATABASE_CONNECTION_STRING) {
   console.warn("For production, set DATABASE_CONNECTION_STRING environment variable.");
 }
 
-mongoose.connect(CONNECTION_STRING).catch((error) => {
+// Ensure database name is set to 'kambaz'
+const connectionOptions = {
+  dbName: "kambaz"
+};
+
+// If connection string already has a database name, mongoose will use it
+// Otherwise, we explicitly set it via options
+mongoose.connect(CONNECTION_STRING, connectionOptions).catch((error) => {
   console.error("MongoDB connection error:", error.message);
   console.error("Make sure DATABASE_CONNECTION_STRING is set correctly in your environment variables.");
   process.exit(1);
 });
 
 mongoose.connection.on("connected", () => {
-  console.log("Connected to MongoDB:", CONNECTION_STRING.replace(/\/\/[^:]+:[^@]+@/, "//***:***@")); // Hide credentials in logs
+  const dbName = mongoose.connection.db?.databaseName || "unknown";
+  console.log("Connected to MongoDB database:", dbName);
+  console.log("Connection string:", CONNECTION_STRING.replace(/\/\/[^:]+:[^@]+@/, "//***:***@")); // Hide credentials in logs
 });
 
 mongoose.connection.on("error", (error) => {
