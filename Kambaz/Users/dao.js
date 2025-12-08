@@ -16,6 +16,20 @@ export default function UsersDao(db) {
 
   const findUserByCredentials = async (username, password) => {
     try {
+      // Debug: Check if user exists
+      const userByUsername = await model.findOne({ username });
+      if (!userByUsername) {
+        console.log(`User not found: ${username}`);
+        return null;
+      }
+      
+      // Debug: Check password match
+      if (userByUsername.password !== password) {
+        console.log(`Password mismatch for user: ${username}`);
+        console.log(`Expected: ${password}, Got: ${userByUsername.password}`);
+        return null;
+      }
+      
       const user = await model.findOne({ username, password });
       return user;
     } catch (error) {
